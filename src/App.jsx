@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
+import { useAuthState } from 'react-firebase-hooks/auth';
 import DefaultLayout from './layout/DefaultLayout';
 import Loader from './common/Loader';
 import SignIn from './pages/Authentication/SignIn';
@@ -8,10 +9,13 @@ import PageTitle from './components/PageTitle';
 import Dashboard from './pages/Dashboard';
 import AddMoney from './components/Wallet/AddMoney/AddMoney';
 import ApplyAdManager from './pages/Ad/ApplyAdManager/ApplyAdManager';
-// import SignUp from './pages/Authentication/SignUp'; // Uncomment if SignUp component exists
+import NotAuthorized from './pages/NotAuthorized/NotAuthorized';
+import PrivateRoute from './hooks/PrivateRoute';
+import auth from './firebaseInit';
 
 function App() {
-  const [loading, setLoading] = useState(true);
+  const [user, loading] = useAuthState(auth); // Use the auth object
+  const [isLoading, setLoading] = useState(true);
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -19,73 +23,36 @@ function App() {
   }, [pathname]);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    const timer = setTimeout(() => setLoading(false), 1000);
+    return () => clearTimeout(timer);
   }, []);
 
-  return loading ? (
+  return isLoading ? (
     <Loader />
   ) : (
-    <DefaultLayout>
-      <Routes>
-        <Route
-          index
-          element={
-            <>
-              <PageTitle title="Inventory Dashboard " />
-              <Dashboard />
-            </>
-          }
-        />
-        <Route
-          path="/dashboard"
-          element={
-            <>
-              <PageTitle title="Inventory Dashboard " />
-              <Dashboard />
-            </>
-          }
-        />
-        <Route
-          path="/auth/signin"
-          element={
-            <>
-              <PageTitle title="Signin " />
-              <SignIn />
-            </>
-          }
-        />
-        <Route
-          path="/wallet/add-money"
-          element={
-            <>
-              <PageTitle title="Add Money " />
-              {/* Uncomment the next line if you have a SignUp component */}
-              <AddMoney />
-            </>
-          }
-        />
-        <Route
-          path="/ad/apply"
-          element={
-            <>
-              <PageTitle title="Apply for ad manager " />
-              {/* Uncomment the next line if you have a SignUp component */}
-              <ApplyAdManager />
-            </>
-          }
-        />
-        <Route
-          path="/auth/signup"
-          element={
-            <>
-              <PageTitle title="Signup " />
-              {/* Uncomment the next line if you have a SignUp component */}
-              {/* <SignUp /> */}
-            </>
-          }
-        />
-      </Routes>
-    </DefaultLayout>
+    <Routes>
+      {/* Authentication Route */}
+      <Route path="/auth/signin" element={<SignIn />} />
+      <Route path="/not-authorized" element={<NotAuthorized />} />
+
+      {/* Protected Routes */}
+      <Route
+        path="*"
+        element={
+          <PrivateRoute>
+            <DefaultLayout>
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/wallet/add-money" element={<AddMoney />} />
+                <Route path="/ad/apply" element={<ApplyAdManager />} />
+                {/* Additional Routes can go here... */}
+              </Routes>
+            </DefaultLayout>
+          </PrivateRoute>
+        }
+      />
+    </Routes>
   );
 }
 
