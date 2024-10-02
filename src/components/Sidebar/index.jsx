@@ -5,6 +5,8 @@ import Logo from '../../images/logo/inventory_logo.png';
 import {
     FaChartBar, FaCogs, FaWarehouse, FaAdjust, FaSignOutAlt
 } from 'react-icons/fa';
+import { signOut } from 'firebase/auth';
+import auth from '../../firebaseInit';
 
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     const location = useLocation();
@@ -103,6 +105,14 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                                                 </li>
                                                 <li>
                                                     <NavLink
+                                                        to="/wallet/add-money-status"
+                                                        className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
+                                                    >
+                                                        Add Money Status
+                                                    </NavLink>
+                                                </li>
+                                                {/* <li>
+                                                    <NavLink
                                                         to="/wallet/pay-link"
                                                         className="group relative flex items-center gap-2.5 rounded-md px-4 font-medium text-bodydark2 duration-300 ease-in-out hover:text-white"
                                                     >
@@ -116,7 +126,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                                                     >
                                                         Wallet Flow
                                                     </NavLink>
-                                                </li>
+                                                </li> */}
                                             </ul>
                                         </div>
                                     </>
@@ -199,9 +209,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                                 )}
                             </SidebarLinkGroup>
 
-                            <li>
+                            <li onClick={() => signOut(auth)}>
                                 <NavLink
-                                    to="/logout"
+                                    to="/auth/signin"
                                     className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-medium text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${pathname.includes('logout') && 'bg-graydark dark:bg-meta-4'}`}
                                 >
                                     <FaSignOutAlt />

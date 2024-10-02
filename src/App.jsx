@@ -12,6 +12,10 @@ import ApplyAdManager from './pages/Ad/ApplyAdManager/ApplyAdManager';
 import NotAuthorized from './pages/NotAuthorized/NotAuthorized';
 import PrivateRoute from './hooks/PrivateRoute';
 import auth from './firebaseInit';
+import AdAccountListTable from './pages/AdACcountList/AdAccountList';
+import DepositStatus from './components/Wallet/DepositStatus/DepositStatus';
+import SignUpPage from './pages/Authentication/SignUp';
+import ForgotPasswordPage from './pages/Authentication/ForgotPassword';
 
 function App() {
   const [user, loading] = useAuthState(auth); // Use the auth object
@@ -33,6 +37,8 @@ function App() {
     <Routes>
       {/* Authentication Route */}
       <Route path="/auth/signin" element={<SignIn />} />
+      <Route path="/auth/signup" element={<SignUpPage />} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/not-authorized" element={<NotAuthorized />} />
 
       {/* Protected Routes */}
@@ -45,7 +51,9 @@ function App() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/wallet/add-money" element={<AddMoney />} />
+                <Route path="/wallet/add-money-status" element={<DepositStatus />} />
                 <Route path="/ad/apply" element={<ApplyAdManager />} />
+                <Route path="/ad/account-list" element={<AdAccountListTable />} />
                 {/* Additional Routes can go here... */}
               </Routes>
             </DefaultLayout>
