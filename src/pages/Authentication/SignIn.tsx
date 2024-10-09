@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSignInWithEmailAndPassword } from 'react-firebase-hooks/auth';
 import auth from '../../firebaseInit';
+import useUser from '../../hooks/useUser';
 
 const Input = ({ label, id, type, value, onChange, placeholder }) => (
   <div className="mb-4">
@@ -31,6 +32,7 @@ const Button = ({ children, onClick, disabled, type = "button" }) => (
 );
 
 const LoginPage = () => {
+  const { userData } = useUser();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -51,7 +53,7 @@ const LoginPage = () => {
     }
   };
 
-  if (user) {
+  if (user || userData?.uid) {
     navigate('/');
   }
 

@@ -74,7 +74,7 @@ export default function AddMoney() {
             console.log(depositData);
 
             // Send the data to your API endpoint
-            await axios.post('http://localhost:4000/deposit', depositData);
+            await axios.post(`http://localhost:4000/deposit/${user?.email}`, depositData);
 
             // Reset form values
             setAmount('');
