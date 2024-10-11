@@ -78,7 +78,7 @@ const SignUpPage = () => {
         console.log('User data:', userData);
 
         // save user data to my own database
-        const result4 = await axios.post('http://localhost:4000/register', userData);
+        const result4 = await axios.post('https://ads-agency-backend.vercel.app/register', userData);
         console.log(result4)
         // check if the request was successful
         if (result4.status === 200) {

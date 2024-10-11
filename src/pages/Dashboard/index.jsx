@@ -1,15 +1,42 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import auth from './../../firebaseInit.js';
 import CardDataStats from '../../components/CardDataStats';
 import ChatCard from '../../components/Chat/ChatCard';
 import ChartOne from '../../components/Charts/ChartOne';
 import ChartTwo from '../../components/Charts/ChartTwo';
 import ChartThree from '../../components/Charts/ChartThree';
 import TableOne from '../../components/Tables/TableOne';
+import useUser from '../../hooks/useUser';
 
 const Dashboard = () => {
+    const [user, loading] = useAuthState(auth);
+    const { userData } = useUser();
+    const [data, setData] = useState();
+    const [dataLoading, setDataLoading] = useState(false);
+
+    useEffect(() => {
+        setDataLoading(true);
+        const fetchUser = () => {
+            fetch(`https://ads-agency-backend.vercel.app/getUserAdAccounts/${user?.email}`)
+                .then(response => response.json())
+                .then(data => setData(data))
+                .finally(() => setDataLoading(false));
+        };
+
+        fetchUser();
+    }, [user?.email]);
+
+    console.log(data)
+
+    if (loading || dataLoading) {
+        return <div>Loading...</div>
+    }
+    console.log(userData)
     return (
         <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-                <CardDataStats title="Main Balance" total="$3.457K" rate="0.00%" levelUp>
+                <CardDataStats title="Main Balance" total={`$${userData?.balance}`} rate="0.00%" levelUp>
                     <svg
                         className="fill-primary dark:fill-white"
                         width="22"
@@ -29,7 +56,7 @@ const Dashboard = () => {
                     </svg>
                 </CardDataStats>
 
-                <CardDataStats title="Ad Accounts" total="15" rate="0" levelUp>
+                <CardDataStats title="Ad Accounts" total={dataLoading || loading ? "Loading..." : data?.length} rate="0" levelUp>
                     <svg
                         className="fill-primary dark:fill-white"
                         width="22"

@@ -13,7 +13,7 @@ const useUser = () => {
             // Fetch user data when the user is logged in
             const fetchUserData = async () => {
                 try {
-                    const res = await axios.get(`http://localhost:4000/getUser/${user.email}`);
+                    const res = await axios.get(`https://ads-agency-backend.vercel.app/getUser/${user.email}`);
                     setUserData(res.data);
                 } catch (err) {
                     setError(err); // Set error state

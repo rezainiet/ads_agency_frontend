@@ -1,7 +1,7 @@
 // apiUtils.js
 
 // Updated API base URL for your local development environment
-const API_BASE_URL = 'http://localhost:4000/api/v1';
+const API_BASE_URL = 'https://ads-agency-backend.vercel.app/api/v1';
 
 /**
  * Utility function to handle API requests.

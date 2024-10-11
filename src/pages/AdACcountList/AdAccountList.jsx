@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import auth from '../../firebaseInit';
 import { X } from 'lucide-react';
-import App from '../../App';
 import axios from 'axios';
 
 // Custom Button component
@@ -54,6 +53,18 @@ const Modal = ({ isOpen, onClose, children }) => {
     );
 };
 
+// Message component
+const Message = ({ message, type }) => {
+    const bgColor = type === 'success' ? 'bg-green-100 dark:bg-green-800' : 'bg-red-100 dark:bg-red-800';
+    const textColor = type === 'success' ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200';
+
+    return (
+        <div className={`${bgColor} ${textColor} p-4 rounded-md mb-4`}>
+            {message}
+        </div>
+    );
+};
+
 const AdAccountListTable = () => {
     const [user] = useAuthState(auth);
     const [accounts, setAccounts] = useState([]);
@@ -61,12 +72,13 @@ const AdAccountListTable = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [bmId, setBmId] = useState('');
     const [selectedAccountId, setSelectedAccountId] = useState(null);
+    const [message, setMessage] = useState(null);
 
     // Fetch ad accounts from the API when the component mounts
     useEffect(() => {
         const fetchAdAccounts = async () => {
             try {
-                const response = await fetch(`http://localhost:4000/getUserAdAccounts/${user?.email}`);
+                const response = await fetch(`https://ads-agency-backend.vercel.app/getUserAdAccounts/${user?.email}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch ad accounts');
                 }
@@ -74,6 +86,7 @@ const AdAccountListTable = () => {
                 setAccounts(data);
             } catch (error) {
                 console.error(error);
+                setMessage({ text: 'Failed to fetch ad accounts. Please try again later.', type: 'error' });
             }
         };
 
@@ -92,6 +105,7 @@ const AdAccountListTable = () => {
     // Handle account deletion
     const handleDelete = (id) => {
         setAccounts(accounts.filter(account => account.id !== id));
+        setMessage({ text: 'Account deleted successfully', type: 'success' });
     };
 
     // Get status badge color
@@ -113,22 +127,26 @@ const AdAccountListTable = () => {
 
     // Handle submit for BM Share
     const handleSubmitBMShare = async () => {
-        // Here you would typically send the bmId and selectedAccountId to your backend
-        console.log(`Sharing account ${selectedAccountId} with Business Manager ${bmId}`);
-
-        // update the selected account's BM ID
-
-        const result = await axios.put(`http://localhost:4000/updateAdAccountBmId/${selectedAccountId}`, { bmId });
-        console.log(result)
-        if (result.status === 200) {
-            setIsModalOpen(false);
-            setBmId('');
-            setSelectedAccountId(null);
-            console.log('Account shared successfully');
-        } else {
-            console.error('Failed to share account');
+        try {
+            const result = await axios.put(`https://ads-agency-backend.vercel.app/updateAdAccountBmId/${selectedAccountId}`, { bmId });
+            if (result.status === 200) {
+                setIsModalOpen(false);
+                setBmId('');
+                setSelectedAccountId(null);
+                setMessage({ text: 'Account shared successfully', type: 'success' });
+                // Update the account in the local state
+                setAccounts(accounts.map(account =>
+                    account.id === selectedAccountId
+                        ? { ...account, bmId: bmId, status: 'Paused' }
+                        : account
+                ));
+            } else {
+                throw new Error('Failed to share account');
+            }
+        } catch (error) {
+            console.error('Error sharing account:', error);
+            setMessage({ text: 'Failed to share account. Please try again.', type: 'error' });
         }
-
     };
 
     return (
@@ -140,6 +158,9 @@ const AdAccountListTable = () => {
                     Add Account
                 </Button>
             </div>
+
+            {/* Message display */}
+            {message && <Message message={message.text} type={message.type} />}
 
             {/* Search Input */}
             <div className="mb-4">
@@ -172,10 +193,11 @@ const AdAccountListTable = () => {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm dark:text-slate-400 text-slate-500">{getStatusBadge(account.status)}</td>
                                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                     <Button
+                                        disabled={account?.bmId}
                                         className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-400 mr-2"
                                         onClick={() => handleBMShare(account.id)}
                                     >
-                                        BM Share
+                                        {account?.bmId ? "Already Shared" : "BM Share"}
                                     </Button>
                                     <Button
                                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-500"

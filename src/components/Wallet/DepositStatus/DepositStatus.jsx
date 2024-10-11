@@ -15,7 +15,7 @@ export default function DepositStatus() {
     useEffect(() => {
         const fetchDeposits = async () => {
             try {
-                const response = await axios.get(`http://localhost:4000/getDeposits/${user?.email}`);
+                const response = await axios.get(`https://ads-agency-backend.vercel.app/getDeposits/${user?.email}`);
                 setDeposits(response.data);
                 setFilteredDeposits(response.data);
                 setLoading(false);

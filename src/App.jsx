@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-
 import { useAuthState } from 'react-firebase-hooks/auth';
 import DefaultLayout from './layout/DefaultLayout';
 import Loader from './common/Loader';
 import SignIn from './pages/Authentication/SignIn';
-import PageTitle from './components/PageTitle';
 import Dashboard from './pages/Dashboard';
 import AddMoney from './components/Wallet/AddMoney/AddMoney';
 import ApplyAdManager from './pages/Ad/ApplyAdManager/ApplyAdManager';

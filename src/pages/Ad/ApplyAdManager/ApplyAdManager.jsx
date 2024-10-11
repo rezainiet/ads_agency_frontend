@@ -65,7 +65,7 @@ export default function ApplyAdManager() {
             setAdAccounts(
                 Array.from({ length: parseInt(adAccountCount, 10) }, () => ({
                     adAccountType,
-                    status: 'Paused',
+                    status: 'Pending',
                     id: uuidv4(),
                     name: '',
                     timezone: '',
@@ -147,7 +147,7 @@ export default function ApplyAdManager() {
                 status: 'pending',
             };
             console.dir(formData);
-            fetch('http://localhost:4000/order', {
+            fetch('https://ads-agency-backend.vercel.app/order', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -156,18 +156,22 @@ export default function ApplyAdManager() {
             })
                 .then((response) => response.json())
                 .then((data) => {
-                    console.log(data);
-                    setSnackbar({
-                        open: true,
-                        message: "Your ad manager application has been successfully submitted.",
-                        severity: "success"
-                    });
+                    if (data.message === 'Order placed successfully') {
+                        setSnackbar({
+                            open: true,
+                            message: `Your ad manager application has been successfully submitted. Updated balance: $${data.updatedBalance.toFixed(2)}`,
+                            severity: "success"
+                        });
+                        // You might want to update the user's balance in your app state here
+                    } else {
+                        throw new Error(data.message || 'An error occurred');
+                    }
                 })
                 .catch((error) => {
                     console.error('Error:', error);
                     setSnackbar({
                         open: true,
-                        message: "There was an error submitting your application. Please try again.",
+                        message: error.message || "There was an error submitting your application. Please try again.",
                         severity: "error"
                     });
                 });
@@ -230,8 +234,6 @@ export default function ApplyAdManager() {
                                                         className="dark:text-white dark:bg-slate-700"
                                                     >
                                                         <MenuItem value="facebook">Facebook</MenuItem>
-                                                        {/* <MenuItem value="google">Google</MenuItem>
-                                                        <MenuItem value="tiktok">TikTok</MenuItem> */}
                                                     </Select>
                                                     {errors.adAccountType && (
                                                         <Typography variant="caption" color="error" className="dark:text-red-400">
@@ -320,8 +322,12 @@ export default function ApplyAdManager() {
                                                                         InputLabelProps={{
                                                                             className: "dark:text-slate-300"
                                                                         }}
+                                                                        inputProps={{
+                                                                            min: 100  // Set minimum value to 100
+                                                                        }}
                                                                     />
                                                                 </Grid>
+
                                                             </Grid>
                                                         </CardContent>
                                                     </Card>
@@ -338,7 +344,7 @@ export default function ApplyAdManager() {
                                                         labelId="page-number-label"
                                                         id="pageNumber"
                                                         value={pageNumber}
-                                                        label="Number of Pages"
+                                                        label="Number of  Pages"
                                                         onChange={handlePageNumberChange}
                                                         error={!!errors.pageNumber}
                                                         className="dark:text-white dark:bg-slate-700"
